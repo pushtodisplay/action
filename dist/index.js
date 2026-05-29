@@ -25688,11 +25688,9 @@ exports.run = run;
 const core = __importStar(__nccwpck_require__(7484));
 // --- Input parsing ---
 function parseInputs() {
-    const apiUrl = core
-        .getInput("api-url", { required: true })
-        .replace(/\/+$/, "");
-    const pushToken = core.getInput("push-token", { required: true });
-    core.setSecret(pushToken);
+    const apiUrl = core.getInput("api-url").replace(/\/+$/, "");
+    const apiKey = core.getInput("api-key", { required: true });
+    core.setSecret(apiKey);
     const boardId = core.getInput("board-id") || undefined;
     const text = core.getInput("text");
     const blocksJson = core.getInput("blocks");
@@ -25717,7 +25715,26 @@ function parseInputs() {
         }
     }
     else {
-        blocks = [{ text }];
+        const block = { text };
+        const size = core.getInput("size");
+        if (size) {
+            if (!["small", "medium", "large"].includes(size)) {
+                throw new Error('"size" must be one of: small, medium, large.');
+            }
+            block.size = size;
+        }
+        const weight = core.getInput("weight");
+        if (weight) {
+            if (!["regular", "semibold", "bold"].includes(weight)) {
+                throw new Error('"weight" must be one of: regular, semibold, bold.');
+            }
+            block.weight = weight;
+        }
+        const color = core.getInput("color");
+        if (color) {
+            block.color = color;
+        }
+        blocks = [block];
     }
     const request = { blocks };
     if (boardId) {
@@ -25760,17 +25777,17 @@ function parseInputs() {
     if (background) {
         request.background = background;
     }
-    return { apiUrl, pushToken, request };
+    return { apiUrl, apiKey, request };
 }
 // --- API call ---
-async function sendUpdate(apiUrl, pushToken, request) {
+async function sendUpdate(apiUrl, apiKey, request) {
     const url = `${apiUrl}/v1/updates`;
     const response = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            "X-Api-Key": pushToken,
+            "X-Api-Key": apiKey,
         },
         body: JSON.stringify(request),
     });
@@ -25799,9 +25816,9 @@ async function sendUpdate(apiUrl, pushToken, request) {
 // --- Main ---
 async function run() {
     try {
-        const { apiUrl, pushToken, request } = parseInputs();
+        const { apiUrl, apiKey, request } = parseInputs();
         core.info(`Pushing update to board "${request.boardId ?? "(default)"}" (${request.blocks.length} block(s))`);
-        const result = await sendUpdate(apiUrl, pushToken, request);
+        const result = await sendUpdate(apiUrl, apiKey, request);
         core.setOutput("message-id", result.messageId);
         core.info(`Message sent successfully (ID: ${result.messageId})`);
     }
