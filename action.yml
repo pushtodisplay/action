@@ -1,0 +1,65 @@
+name: "Push to Display"
+description: "Push content to devices using the Push to Display API"
+author: "Goban Source, LLC"
+
+branding:
+  icon: "monitor"
+  color: "blue"
+
+inputs:
+  api-url:
+    description: "Base URL of the Push to Display API. Override only for self-hosted instances or testing."
+    required: false
+    default: "https://api.pushtodisplay.com"
+  api-key:
+    description: "API key for authentication (used as X-Api-Key header)"
+    required: true
+  board-id:
+    description: "Board ID to push content to. If omitted, the user's default board is used."
+    required: false
+  text:
+    description: "Simple text content to display. For multiple blocks or advanced options, use the blocks input instead."
+    required: false
+  size:
+    description: "Text size: small, medium, or large (applies to text input only)"
+    required: false
+  weight:
+    description: "Text weight: regular, semibold, or bold (applies to text input only)"
+    required: false
+  color:
+    description: "Text color in hex format (#RRGGBB, applies to text input only)"
+    required: false
+  blocks:
+    description: >
+      JSON array of display blocks. Each block must have a "text" field.
+      Optional per-block fields: size (small|medium|large), weight (regular|semibold|bold),
+      color (#RRGGBB), background (#RRGGBB).
+      Example: [{"text":"Deploy OK","size":"large","weight":"bold","color":"#00FF00"}]
+    required: false
+  panel-id:
+    description: "Panel ID (1-4) to target a specific panel on the board"
+    required: false
+  full-panel:
+    description: "Use full panel display mode (true/false)"
+    required: false
+    default: "false"
+  density:
+    description: "Line density: compact, standard, or spacious"
+    required: false
+  align-x:
+    description: "Horizontal alignment: start, center, or end"
+    required: false
+  align-y:
+    description: "Vertical alignment: start, center, or end"
+    required: false
+  background:
+    description: "Background color in hex format (#RRGGBB)"
+    required: false
+
+outputs:
+  message-id:
+    description: "The message ID returned by the API"
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
