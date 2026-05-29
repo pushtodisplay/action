@@ -5,7 +5,7 @@ A GitHub Action that pushes content to devices using the [Push to Display](https
 ## Quick Start
 
 ```yaml
-- uses: pushtodisplay/action@v1.0.0
+- uses: pushtodisplay/action@v1
   with:
     api-key: ${{ secrets.PTD_API_KEY }}
     board-id: ${{ secrets.PTD_BOARD_ID }}
@@ -44,7 +44,7 @@ A GitHub Action that pushes content to devices using the [Push to Display](https
 ### Simple text message
 
 ```yaml
-- uses: pushtodisplay/action@v1.0.0
+- uses: pushtodisplay/action@v1
   with:
     api-key: ${{ secrets.PTD_API_KEY }}
     board-id: ${{ secrets.PTD_BOARD_ID }}
@@ -54,7 +54,7 @@ A GitHub Action that pushes content to devices using the [Push to Display](https
 ### Styled text message
 
 ```yaml
-- uses: pushtodisplay/action@v1.0.0
+- uses: pushtodisplay/action@v1
   with:
     api-key: ${{ secrets.PTD_API_KEY }}
     board-id: ${{ secrets.PTD_BOARD_ID }}
@@ -68,7 +68,7 @@ A GitHub Action that pushes content to devices using the [Push to Display](https
 ### Styled blocks
 
 ```yaml
-- uses: pushtodisplay/action@v1.0.0
+- uses: pushtodisplay/action@v1
   with:
     api-key: ${{ secrets.PTD_API_KEY }}
     board-id: ${{ secrets.PTD_BOARD_ID }}
@@ -87,7 +87,7 @@ A GitHub Action that pushes content to devices using the [Push to Display](https
 ### Target a specific panel
 
 ```yaml
-- uses: pushtodisplay/action@v1.0.0
+- uses: pushtodisplay/action@v1
   with:
     api-key: ${{ secrets.PTD_API_KEY }}
     board-id: ${{ secrets.PTD_BOARD_ID }}
@@ -98,7 +98,7 @@ A GitHub Action that pushes content to devices using the [Push to Display](https
 ### Use outputs in subsequent steps
 
 ```yaml
-- uses: pushtodisplay/action@v1.0.0
+- uses: pushtodisplay/action@v1
   id: push
   with:
     api-key: ${{ secrets.PTD_API_KEY }}
