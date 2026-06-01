@@ -2,6 +2,10 @@
 
 A GitHub Action that pushes content to devices using the [Push to Display](https://pushtodisplay.com) API. Use it in your CI/CD workflows to send deployment statuses, build results, alerts, or any structured content to physical display devices.
 
+<p align="center">
+  <img src="assets/display-4-panel-status.png" alt="Push to Display — 4-panel regional status board" width="600" />
+</p>
+
 ## Quick Start
 
 ```yaml
@@ -127,6 +131,23 @@ This action uses API keys for authentication. API keys are issued from the Push 
 1. Open the Push to Display admin portal
 2. Navigate to **API Keys** and tap **Issue API Key**
 3. Copy the API key and add it as a repository secret (e.g., `PTD_API_KEY`)
+
+## Screenshots
+
+<p align="center">
+  <img src="assets/display-4-panel-status.png" alt="4-panel regional status board" width="600" /><br />
+  <em>4-panel layout — regional status at a glance</em>
+</p>
+
+<p align="center">
+  <img src="assets/display-2-panel-logs.png" alt="2-panel layout with CI/CD logs" width="600" /><br />
+  <em>Multi-panel with CI/CD pipeline and infrastructure logs</em>
+</p>
+
+<p align="center">
+  <img src="assets/display-incident-timeline.png" alt="Incident timeline display" width="600" /><br />
+  <em>Incident timeline with color-coded severity</em>
+</p>
 
 ## Development
 
