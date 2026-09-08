@@ -153,6 +153,8 @@ export function parseInputs(): {
 
 // --- API call ---
 
+const REQUEST_TIMEOUT_MS = 30_000; // the action owns its own bound: never hang a workflow
+
 export async function sendUpdate(
   apiUrl: string,
   apiKey: string,
@@ -160,15 +162,26 @@ export async function sendUpdate(
 ): Promise<MessagePostAcceptedResponse> {
   const url = `${apiUrl}/v1/updates`;
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-Api-Key": apiKey,
-    },
-    body: JSON.stringify(request),
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-Api-Key": apiKey,
+      },
+      body: JSON.stringify(request),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+  } catch (error) {
+    if ((error as Error | undefined)?.name === "TimeoutError") {
+      throw new Error(
+        `Push to Display API request timed out after ${REQUEST_TIMEOUT_MS / 1000}s`,
+      );
+    }
+    throw error;
+  }
 
   if (!response.ok) {
     let errorDetail: string;
@@ -211,7 +224,14 @@ export async function run(): Promise<void> {
 
     core.info(`Message sent successfully (ID: ${result.messageId})`);
   } catch (error) {
-    core.setFailed(error instanceof Error ? error.message : String(error));
+    const message = error instanceof Error ? error.message : String(error);
+    // Fail-soft by design: this action never fails the workflow. Errors are
+    // reported as warning annotations on the step for visibility.
+    core.warning(
+      message.startsWith("Push to Display")
+        ? message
+        : `Push to Display: ${message}`,
+    );
   }
 }
 

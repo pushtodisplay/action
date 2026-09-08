@@ -15,6 +15,7 @@ const mockSetSecret = core.setSecret as jest.MockedFunction<
   typeof core.setSecret
 >;
 const mockInfo = core.info as jest.MockedFunction<typeof core.info>;
+const mockWarning = core.warning as jest.MockedFunction<typeof core.warning>;
 
 // Mock global fetch
 const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>;
@@ -516,6 +517,7 @@ describe("sendUpdate", () => {
           "X-Api-Key": "tok_abc",
         },
         body: JSON.stringify(request),
+        signal: expect.any(AbortSignal),
       },
     );
 
@@ -616,6 +618,19 @@ describe("sendUpdate", () => {
         blocks: [{ text: "hi" }],
       }),
     ).rejects.toThrow("fetch failed");
+  });
+
+  test("throws a clear error when the request times out", async () => {
+    const timeoutErr = new Error("The operation was aborted due to timeout");
+    timeoutErr.name = "TimeoutError";
+    mockFetch.mockRejectedValueOnce(timeoutErr);
+
+    await expect(
+      sendUpdate("https://api.example.com", "tok_abc", {
+        boardId: "b",
+        blocks: [{ text: "hi" }],
+      }),
+    ).rejects.toThrow(/timed out after 30s/);
   });
 
   test("throws with title-only error body (no detail or errors)", async () => {
@@ -736,7 +751,7 @@ describe("run", () => {
     );
   });
 
-  test("calls setFailed on input validation error", async () => {
+  test("warns instead of failing on input validation error", async () => {
     setInputs({
       "api-url": "https://api.example.com",
       "api-key": "tok_abc",
@@ -745,13 +760,14 @@ describe("run", () => {
 
     await run();
 
-    expect(mockSetFailed).toHaveBeenCalledWith(
+    expect(mockWarning).toHaveBeenCalledWith(
       expect.stringContaining('Either "text" or "blocks" input is required'),
     );
+    expect(mockSetFailed).not.toHaveBeenCalled();
     expect(mockSetOutput).not.toHaveBeenCalled();
   });
 
-  test("calls setFailed on API error", async () => {
+  test("warns instead of failing on API error", async () => {
     setInputs({
       "api-url": "https://api.example.com",
       "api-key": "tok_abc",
@@ -770,12 +786,13 @@ describe("run", () => {
 
     await run();
 
-    expect(mockSetFailed).toHaveBeenCalledWith(
+    expect(mockWarning).toHaveBeenCalledWith(
       expect.stringContaining("Push to Display API returned 500"),
     );
+    expect(mockSetFailed).not.toHaveBeenCalled();
   });
 
-  test("calls setFailed on network error", async () => {
+  test("warns instead of failing on network error", async () => {
     setInputs({
       "api-url": "https://api.example.com",
       "api-key": "tok_abc",
@@ -787,10 +804,31 @@ describe("run", () => {
 
     await run();
 
-    expect(mockSetFailed).toHaveBeenCalledWith("fetch failed");
+    expect(mockWarning).toHaveBeenCalledWith("Push to Display: fetch failed");
+    expect(mockSetFailed).not.toHaveBeenCalled();
   });
 
-  test("handles non-Error thrown values", async () => {
+  test("warns instead of failing on request timeout", async () => {
+    setInputs({
+      "api-url": "https://api.example.com",
+      "api-key": "tok_abc",
+      "board-id": "board-123",
+      text: "Hello",
+    });
+
+    const timeoutErr = new Error("The operation was aborted due to timeout");
+    timeoutErr.name = "TimeoutError";
+    mockFetch.mockRejectedValueOnce(timeoutErr);
+
+    await run();
+
+    expect(mockWarning).toHaveBeenCalledWith(
+      expect.stringContaining("timed out after 30s"),
+    );
+    expect(mockSetFailed).not.toHaveBeenCalled();
+  });
+
+  test("warns instead of failing on non-Error thrown values", async () => {
     setInputs({
       "api-url": "https://api.example.com",
       "api-key": "tok_abc",
@@ -802,7 +840,8 @@ describe("run", () => {
 
     await run();
 
-    expect(mockSetFailed).toHaveBeenCalledWith("string error");
+    expect(mockWarning).toHaveBeenCalledWith("Push to Display: string error");
+    expect(mockSetFailed).not.toHaveBeenCalled();
   });
 
   test("does not set deprecated outputs", async () => {

@@ -43,6 +43,32 @@ A GitHub Action that pushes content to devices using the [Push to Display](https
 | ------------ | ---------------------------------- |
 | `message-id` | The message ID returned by the API |
 
+## Failure behavior
+
+This action **never fails the workflow**. All errors — misconfigured inputs,
+invalid credentials, a missing board, or a Push to Display API outage — are
+reported as **warning annotations** on the step, and the step always succeeds.
+Requests are time-boxed (30s) so a hung connection cannot stall a workflow.
+
+If your board is not updating, check the warning annotations on the run:
+
+- `Push to Display API returned 404...` — check `board-id` / `api-key`
+- `Push to Display API returned 401/403...` — invalid or revoked API key
+- `Push to Display API returned 5xx...` — temporary service issue
+- `Push to Display: ...` (no API message) — misconfigured input
+
+To report at the end of a job even when earlier steps fail, use `if: always()`:
+
+```yaml
+- name: Report status
+  if: always()
+  uses: pushtodisplay/action@v1
+  with:
+    api-key: ${{ secrets.PTD_API_KEY }}
+    board-id: ${{ secrets.PTD_BOARD_ID }}
+    text: "Run ${{ github.run_number }} finished"
+```
+
 ## Examples
 
 ### Simple text message
