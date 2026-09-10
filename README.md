@@ -3,7 +3,7 @@
 A GitHub Action that pushes content to devices using the [Push to Display](https://pushtodisplay.com) API. Use it in your CI/CD workflows to send deployment statuses, build results, alerts, or any structured content to physical display devices.
 
 <p align="center">
-  <img src="assets/display-4-panel-status.png" alt="Push to Display — 4-panel regional status board" width="600" />
+  <img src="assets/consolidated-multiple-repo-cicd-in-same-display-4-panel.png" alt="Push to Display — multi-repo CI/CD status consolidated on a 4-panel display" width="600" />
 </p>
 
 ## Quick Start
@@ -161,8 +161,8 @@ This action uses API keys for authentication. API keys are issued from the Push 
 ## Screenshots
 
 <p align="center">
-  <img src="assets/display-4-panel-status.png" alt="4-panel regional status board" width="600" /><br />
-  <em>4-panel layout — regional status at a glance</em>
+  <img src="assets/consolidated-multiple-repo-cicd-in-same-display-4-panel.png" alt="Multi-repo CI/CD status consolidated on a 4-panel display" width="600" /><br />
+  <em>4-panel layout — multi-repo CI/CD status and deployment logs at a glance</em>
 </p>
 
 <p align="center">
